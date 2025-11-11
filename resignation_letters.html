@@ -1,0 +1,204 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset=utf-8>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!--
+    Morgan Lincicum
+    My theme for this remix was resignation letters, trying to completely flip
+    the love for hate. While the sentences often don't make sense at all,
+    I found it really hilarious so I decided to keep going with it.
+    
+    "You are my goshdarn frustration: My incessant wretchedness. You are my horrible job: My aching money. You are my exhausted ambition."
+    
+    Luckily, I've never actually felt that way. But maybe those who have
+    can take it out this way.
+    
+    ORIGINAL:
+	Love Letters reimplementation
+	copyright (c) 2014, 2024 Nick Montfort <nickm@nickm.com>
+	based on a 1953 program by Christopher Strachey
+
+	Copying and distribution of this file, with or without modification,
+	are permitted in any medium without royalty provided the copyright
+	notice and this notice are preserved. This file is offered as-is,
+	without any warranty.
+	-->
+	<style>
+		body {
+			margin: 0;
+			font-family: monospace;
+			font-size: clamp(1rem, 1vw, 1.5rem);
+			overflow:hidden;
+		}
+		header {
+			background: #ddd;
+			margin: 0;
+			border-bottom: #eee solid .2rem;
+			width: 100%;
+			height: 5.2rem;
+			position: fixed;
+			top: 0;
+			left: 0;
+			z-index: 1000;
+		}
+		header > h1 {
+			padding: .3rem .8rem .2rem .8rem;
+			font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', 
+				serif;
+			font-size: .85rem;
+			font-weight: normal;
+			white-space: nowrap;
+		}
+		a {
+			text-decoration: none;
+			color: #b00;
+		}
+		#main {
+			padding: 8rem 6vw 3vh 6vw;
+		}
+	</style>
+	<script>
+		var t = 0, caps = false, pause = false;
+
+		const hugeSpace = '<br><br>          ',
+						  // All non-breaking spaces
+		first = ['Mr.', 'Dear', 'Mrs.', 'To'],
+		second = ['Boss', 'Jenkins', 'You', 'Bigman', 'Johnson', 'Smith','A**hole'],
+		adjectives = ['odious', 'strict', 'harsh', 'anxious', 
+			'ruthless', 'angry', 'wrathful', 'burning', 'spiteful', 'terrible', 
+			'no-good', 'flippin', 'deranged', 'incessant', 'goshdarn', 'laidback', 
+			'withheld', 'bad', 'impatient', 'hateful', 'horrible', 'stinky', 
+			'bug-eyed', 'overdone', 'cranky', 'tired', 'exhausted', 
+			'aching', 'frustrated', 'unsatisfied', 'frustrating'],
+		nouns = ['punishment', 'work', 'ambition', 'boss', 'curse', 
+			'resignation', 'tyrant', 'ghoul', 'demon', 'frustration', 
+			'lifetime', 'job', 'paperwork', 'wretchedness', 'least desire', 
+			'a**hole', 'd***head', 'nonsense', 'disliking', 'hatred', 'exhaustion', 
+			'years', 'email', 'interview', 'phone call', 'headache', 'pain', 
+			'money', 'dollars'],
+		adverbs = ['for the last time', 'anxiously', 'furiously', 'crankily', 
+			'finally', 'unforgivingly', 'with frustration', 'until you die', 
+			'angrily', 'poorly', 'in resignation', 'badly', 'wretchedly', 
+			'impatiently', 'f*ing', 'mistakingly', 'with exhaustion', 'passionately',
+			'wrathfully', 'spitefully', 'ruthlessly', 'mercilessly'],
+		verbs = ['hates', 'spites', 'waits for', 'pays', 'punishes', 
+			'insults', 'curses', 'dislikes', 'doesn\'t appreciate', 
+			'is far from', 'whips', 'sends', 'writes', 'works', 
+			'pains for', 'withholds', 'damns', 'sighs for', 'throws', 
+			'dogs', 'worked for', 'struggled for', 'blasts', 'ends', 
+			'kills'];
+
+		function fullscreenListeners(f)
+		{
+			f("mozfullscreenchange", fullscreenEvt);
+			f("MSFullscreenChange", fullscreenEvt);
+			f("fullscreenchange", fullscreenEvt);
+			f("webkitfullscreenchange", fullscreenEvt);
+		}
+
+		function fullscreenEvt(incomingReq)
+		{
+			fullscreenListeners(document.removeEventListener);
+			if(incomingReq === true || document.mozFullScreen || 
+			document.fullscreenElement || document.webkitIsFullScreen || 
+			document.msFullscreenElement) {
+				var fsElt;
+				if(window.c instanceof HTMLCanvasElement) fsElt = window.c;
+				else fsElt = document.documentElement;
+				if (fsElt.requestFullscreen) fsElt.requestFullscreen();
+				else if (fsElt.msRequestFullscreen) fsElt.msRequestFullscreen();
+				else if (fsElt.mozRequestFullScreen)
+					fsElt.mozRequestFullScreen();
+				else if (fsElt.webkitRequestFullScreen) 
+					fsElt.webkitRequestFullScreen();
+				nav.style.display = "none";
+				main.style.paddingTop = "0";
+			}
+			else nav.style.display = "block";
+			main.style.paddingTop = "8rem";
+			if (typeof l === "function") setTimeout(l, 200);
+			fullscreenListeners(document.addEventListener);
+		}
+
+		function pick(array) {
+			var i = Math.floor(Math.random() * (array.length));
+			return array[i];
+		}
+
+		function maybe(words) {
+			var text = (Math.random() > 0.5) ? ' ' + pick(words) : '';
+			return text;
+		}
+
+		function longer() {
+			return ' My' + maybe(adjectives) + ' ' + pick(nouns) + 
+			maybe(adverbs) + ' ' + pick(verbs) + ' your' + 
+			maybe(adjectives) + ' ' + pick(nouns) + '.';
+		}
+
+		function shorter() { 
+			return ' ' + pick(adjectives) + ' ' + pick(nouns) + '.'; 
+		}
+
+		function letter() {
+			var i, type, you_are = false, text = '';
+			text = text + pick(first) + ' ' + pick(second) + '<br><br>';
+			for (i = 0; i < 10; i = i + 1) {
+				type = pick(['longer', 'shorter']);
+				if (type === 'longer') {
+					text = text + longer();
+					you_are = false;
+				} else {
+					if (you_are) {
+						text = text.slice(0, -1) + ': My' + shorter();
+						you_are = false;
+					} else {
+						text = text + ' You are my' + shorter();
+						you_are = true;
+					}
+				}
+			}
+			text = text + hugeSpace + 'Yours ' + pick(adverbs) + 
+					hugeSpace + '     ' + 'M.U.C.';
+			return text;
+		}
+
+		function nextText() {
+			var last, main = document.getElementById('main');
+			if (pause) setTimeout(nextText, 300);
+			else {
+				if (25 > t) t += 1;
+				else main.removeChild(main.firstChild);
+				last = document.createElement('p');
+				last.innerHTML = caps ? letter().toUpperCase() : letter();
+				main.appendChild(last);
+				main.lastChild.scrollIntoView({block:"end", behavior:"smooth"});
+				setTimeout(nextText, 12000);
+			}
+		}
+	</script>
+	<title>Strachey’s Love Letters (Reimplementation)</title>
+</head>
+<body onload=nextText()>
+	<header id=nav>
+		<h1>
+			<span style="float: right; font-size: 150%; clear:both"><a id=pb 
+				onclick="pause=!pause;pb.style.color=pause?'black':'red'">⏸</a>
+				<a id=cl 
+				onclick="caps=!caps;cl.style.color=caps?'black':'red'">⇪</a> 
+				<a onclick=fullscreenEvt(true)>⛶</a>
+				</span>
+			Resignation Letters<br>
+			based on a work by  
+		<a href="https://en.wikipedia.org/wiki/Christopher_Strachey">Christopher
+			Strachey</a><br>
+			code by <a href="https://nickm.com">Nick Montfort,</a>
+			also in <a href="love_letters.py">Python 2/3</a><br>
+			remixed by Morgan Lincicum
+		</h1>
+	</header>
+	<div id=main></div>
+</body>
+</html>
